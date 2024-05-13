@@ -1,0 +1,19 @@
+version: '3'
+services:
+  gitea-server:
+    image: gitea/gitea:latest
+    volumes:
+      - ./gitea:/data
+    ports:
+      - "3000:3000"
+      - "22:22"
+  jenkins-server:
+    # image: jenkins/jenkins:lts
+    build: ./jenkins/
+    volumes:
+      - ./jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    links:
+      - gitea-server
