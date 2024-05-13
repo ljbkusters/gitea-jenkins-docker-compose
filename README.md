@@ -16,15 +16,28 @@
     2. Click on "Organization" (next to "Repository")
     3. Click on the `+` symbol and add an organization
     4. Give it a meaningful name (like `MyCompany`)
-6. Add a test repository to the newly created organization
+6. Add allowed webhook hosts to gitea server
+    1. Go to `gitea/gitea/conf/app.ini`
+    2. Add the following (TODO: this wildcard is probably risky, would be nice to add a specific host)
+    ```ini
+    [webhook]
+    ALLOWED_HOST_LIST = *
+    ```
+7. Add a test repository to the newly created organization
     1. On the Gitea server, go to the newly created organization (`MyCompany`)
     2. Add a new repository
     3. Push the files under `./jenkins-test/` to this repository
-7. Setup Gitea plugin
+8. Setup Gitea plugin
     1. Visit localhost:8080 (Jenkins server)
     2. Go to "Manage Jenkins"
-    3. Select "System" and scroll down to Gitea Servers
-    4. Add a new Gitea server
+    3. Select "System"
+    4. Scroll down to Jenkins Server and enter `http://jenkins-server:8080/` which
+       will make sure that gitea uses this address in its webhooks, which is within the
+       exposed docker compose network.
+       TODO: altough this fixes the gitea webhook issue, this is bad in the sense that
+       Jenkins will now refer to itself with this address when sending automated emails and similar things, even though we access it from an outside OS on http://localhost:8080
+       (or some portproxy).
+    5. Now scroll down to gitea
     5. Give it a meaningful name (like `gitea`)
     6. Enter the Gitea server address. It can be reached on `http://gitea-server:3000`.
        NOTE: you should see a confirmation that the server is found and a version number
@@ -32,8 +45,7 @@
     7. Add user credentials. This can be the system admin or a dedicated Jenkins account
        on the Gitea server. This will be the account managing webhooks and looking for
        pushed changes.
-    8. (TODO: Alias URL?)
-8. Add a Gitea organization to Jenkins
+9. Add a Gitea organization to Jenkins
     1. Visit localhost:8080 (Jenkins server)
     2. Click on "New Job"
     3. Add an organization folder, give it a meaningful name
@@ -45,6 +57,3 @@
     is scanned for repositories with Jenkinsfiles. It should find the Jenkinsfile
     in the repository you added in step 6.
     8. The Jenkinsfile should run without problems, the build should succeed.
-
-
-Currently the webhooks seem broken but this is an issue I hope to be fixed. It is possible to run build manually though, and upon scanning the jenkins host finds updated branches so at least a polling strategy is already supported.
