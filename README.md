@@ -1,5 +1,7 @@
 # Gitea/Jenkins home dev setup
 
+This repo is a bread-crumb for setting up a Jenkins instance coupled to a Gitea server with dynamic docker pipeline worker nodes. Ideally I would like to automate all these steps but I don't know if I will find the time to do so.
+
 1. Install docker environment using docker-compose
 
 `docker-compose -f docker-compose.yaml up`
@@ -18,11 +20,14 @@
     4. Give it a meaningful name (like `MyCompany`)
 6. Add allowed webhook hosts to gitea server
     1. Go to `gitea/gitea/conf/app.ini`
-    2. Add the following (TODO: this wildcard is probably risky, would be nice to add a specific host)
+    2. Add the following
     ```ini
     [webhook]
     ALLOWED_HOST_LIST = *
     ```
+
+    TODO: this wildcard is probably risky, would be nice to add a specific host
+
 7. Add a test repository to the newly created organization
     1. On the Gitea server, go to the newly created organization (`MyCompany`)
     2. Add a new repository
@@ -34,6 +39,7 @@
     4. Scroll down to Jenkins Server and enter `http://jenkins-server:8080/` which
        will make sure that gitea uses this address in its webhooks, which is within the
        exposed docker compose network.
+
        TODO: altough this fixes the gitea webhook issue, this is bad in the sense that
        Jenkins will now refer to itself with this address when sending automated emails and similar things, even though we access it from an outside OS on http://localhost:8080
        (or some portproxy).
